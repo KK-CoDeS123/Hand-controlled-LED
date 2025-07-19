@@ -5,9 +5,9 @@ import math
 import serial
 import time
 
-# Connect to Arduino (make sure COM port matches yours)
-arduino = serial.Serial('COM3', 9600)  # Replace 'COM3' with your actual port
-time.sleep(2)  # Give time to establish connection
+
+arduino = serial.Serial('COM3', 9600) 
+time.sleep(2)  
 
 # Set up MediaPipe for hand detection
 mp_hands = mp.solutions.hands
@@ -18,11 +18,8 @@ hands = mp_hands.Hands(max_num_hands=1,
 # Webcam input
 cap = cv2.VideoCapture(0)
 
-# Distance thresholds (in pixels) to map to brightness
-MIN_DIST = 30    # Minimum meaningful distance between thumb & index
-MAX_DIST = 220   # Maximum expected distance (adjust based on hand & camera)
-
-# Helper: Calculate distance between two (x, y) points
+MIN_DIST = 30
+MAX_DIST = 220  
 def get_distance(p1, p2):
     return math.hypot(p2[0] - p1[0], p2[1] - p1[1])
 
@@ -31,7 +28,7 @@ while True:
     if not ret:
         continue
 
-    frame = cv2.flip(frame, 1)  # Mirror view
+    frame = cv2.flip(frame, 1)  
     h, w, _ = frame.shape
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = hands.process(rgb)
@@ -48,7 +45,7 @@ while True:
 
         # Normalize distance to brightness (0–255)
         norm = (dist - MIN_DIST) / (MAX_DIST - MIN_DIST)
-        norm = max(0.0, min(norm, 1.0))  # Clamp between 0 and 1
+        norm = max(0.0, min(norm, 1.0))  
         brightness = int(norm * 255)
 
         # Send brightness value to Arduino
@@ -66,7 +63,6 @@ while True:
     cv2.imshow("Finger Brightness Control", frame)
     if cv2.waitKey(1) == 27:  # ESC key to exit
         break
-
 # Cleanup
 cap.release()
 arduino.close()
